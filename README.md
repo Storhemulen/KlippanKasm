@@ -1,2 +1,2 @@
 # KlippanKasm
-My attempts at making cusom kasmweb workspaces.
+My attempts at making custom kasmweb workspaces.
