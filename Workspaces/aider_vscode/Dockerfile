@@ -16,14 +16,14 @@ RUN apt-get update && apt-get install -y git
 
 # Install Aider
 RUN pip install aider
-COPY ./Workspaces/aider_ubuntu/install/chrome $INST_SCRIPTS/chrome/
+COPY ./install/chrome $INST_SCRIPTS/chrome/
 RUN bash $INST_SCRIPTS/chrome/install_chrome.sh  && rm -rf $INST_SCRIPTS/chrome/
 
 
-COPY ./Workspaces/aider_ubuntu/install/vs_code $INST_SCRIPTS/vs_code/
+COPY ./install/vs_code $INST_SCRIPTS/vs_code/
 RUN bash $INST_SCRIPTS/vs_code/install_vs_code.sh  && rm -rf $INST_SCRIPTS/vs_code/
 
-COPY ./Workspaces/aider_ubuntu/install/vs_code/custom_startup.sh $STARTUPDIR/custom_startup.sh
+COPY ./install/vs_code/custom_startup.sh $STARTUPDIR/custom_startup.sh
 RUN chmod +x $STARTUPDIR/custom_startup.sh
 RUN chmod 755 $STARTUPDIR/custom_startup.sh
 
