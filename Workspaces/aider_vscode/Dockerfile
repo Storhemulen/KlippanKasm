@@ -11,7 +11,11 @@ WORKDIR $HOME
 
 ######### Customize Container Here ###########
 
-# Install Google Chrome
+# Install Git
+RUN apt-get update && apt-get install -y git
+
+# Install Aider
+RUN pip install aider
 COPY ./src/ubuntu/install/chrome $INST_SCRIPTS/chrome/
 RUN bash $INST_SCRIPTS/chrome/install_chrome.sh  && rm -rf $INST_SCRIPTS/chrome/
 
