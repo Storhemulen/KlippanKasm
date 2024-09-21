@@ -6,9 +6,10 @@ USER root
 ENV HOME /home/kasm-default-profile
 WORKDIR $HOME
 
-# Install Node.js and NPM
+# Install Git, Python, and Aider
 RUN apt-get update && \
-    apt-get install -y nodejs npm
+    apt-get install -y nodejs npm git python3 python3-pip && \
+    pip3 install aider
 
 # Set up necessary directories and permissions
 RUN mkdir -p /configs /logs && \
