@@ -1,32 +1,39 @@
 ARG BASE_TAG="develop"
-ARG BASE_IMAGE="core-ubuntu-focal"
+ARG BASE_IMAGE="core-ubuntu-jammy"
 FROM kasmweb/$BASE_IMAGE:$BASE_TAG
 USER root
 
-ENV HOME=/home/kasm-default-profile \
-    STARTUPDIR=/dockerstartup \
-    INST_SCRIPTS=$STARTUPDIR/install \
-    DONT_PROMPT_WSL_INSTALL=No_Prompt_please
+ENV HOME=/home/kasm-default-profile
+ENV STARTUPDIR=/dockerstartup
+ENV INST_SCRIPTS=$STARTUPDIR/install
+ENV DONT_PROMPT_WSL_INSTALL="No_Prompt_please"
 WORKDIR $HOME
 
 ######### Customize Container Here ###########
 
-# Install Git
-RUN apt-get update && apt-get install -y git
+# Install Google Chrome
+COPY ./src/ubuntu/install/chrome $INST_SCRIPTS/chrome/
+RUN bash $INST_SCRIPTS/chrome/install_chrome.sh && rm -rf $INST_SCRIPTS/chrome/
 
-# Install Aider
-RUN pip install aider
-COPY install/chrome/ $INST_SCRIPTS/chrome/
-RUN bash $INST_SCRIPTS/chrome/install_chrome.sh  && rm -rf $INST_SCRIPTS/chrome/
+# Install VS Code
+COPY ./src/ubuntu/install/vs_code $INST_SCRIPTS/vs_code/
+RUN bash $INST_SCRIPTS/vs_code/install_vs_code.sh && rm -rf $INST_SCRIPTS/vs_code/
 
-
-COPY install/vs_code/ $INST_SCRIPTS/vs_code/
-RUN bash $INST_SCRIPTS/vs_code/install_vs_code.sh  && rm -rf $INST_SCRIPTS/vs_code/
-
-COPY install/vs_code/custom_startup.sh $STARTUPDIR/custom_startup.sh
+COPY ./src/ubuntu/install/vs_code/custom_startup.sh $STARTUPDIR/custom_startup.sh
 RUN chmod +x $STARTUPDIR/custom_startup.sh
 RUN chmod 755 $STARTUPDIR/custom_startup.sh
 
+# Install Python, Git, and Aider
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip and install aider-chat
+RUN python3 -m pip install --upgrade pip setuptools wheel && \
+    python3 -m pip install --upgrade aider-chat
+
+# Add /usr/local/bin to the PATH for all users via /etc/profile.d/
+RUN echo 'export PATH="/usr/local/bin:$PATH"' > /etc/profile.d/usr_local_bin.sh
 
 # Update the desktop environment to be optimized for a single application
 RUN cp $HOME/.config/xfce4/xfconf/single-application-xfce-perchannel-xml/* $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/
@@ -37,7 +44,7 @@ RUN apt-get remove -y xfce4-panel
 
 RUN chown 1000:0 $HOME
 
-ENV HOME /home/kasm-user
+ENV HOME=/home/kasm-user
 WORKDIR $HOME
 RUN mkdir -p $HOME && chown -R 1000:0 $HOME
 
