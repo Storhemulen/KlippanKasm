@@ -6,10 +6,16 @@ USER root
 ENV HOME /home/kasm-default-profile
 WORKDIR $HOME
 
-# Install Git, Python, and Aider
+# Install Git, Python, Aider, and VSCode
 RUN apt-get update && \
-    apt-get install -y nodejs npm git python3 python3-pip && \
-    pip3 install aider
+    apt-get install -y nodejs npm git python3 python3-pip wget gpg && \
+    pip3 install aider && \
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg && \
+    install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/ && \
+    sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list' && \
+    apt-get update && \
+    apt-get install -y code && \
+    rm -f packages.microsoft.gpg
 
 # Set up necessary directories and permissions
 RUN mkdir -p /configs /logs && \
